@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/plymouth-sailboat/orb/src/orb.cpp
+stdio.h
+-
+stdlib.h
+-
+math.h
+-
+orb_config.hpp
+-
+
+orb_config.hpp
+
