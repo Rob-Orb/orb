@@ -1,0 +1,3 @@
+source /etc/bash_completion
+source /opt/orb/setup.bash
+echo "source /opt/orb/setup.bash" >> ~/.bashrc

@@ -1,0 +1,13 @@
+Source: orb-core
+Maintainer: Ulysse Vautier <ulysse.vautier@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 0.0.1
+Priority: optional
+Section: base
+
+Package: orb-core
+Architecture: armhf
+Priority: optional
+Section: base
+Description: Helper for the Raspberry Pi Rob-Orb shields
+ This binary gives you the power to control different Rob-Orb shields.
