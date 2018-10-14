@@ -9,5 +9,6 @@ Package: orb-upload
 Architecture: armhf
 Priority: optional
 Section: base
+Depends: picberry
 Description: Orb Application to upload firmware to PIC
  This binary gives you the power to control different Rob-Orb shields.
