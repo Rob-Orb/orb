@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 	int opt;
 	int option_index = 0;
 	
-	int du = 0;
-	int mo = 0;
+	int du = 10000;
+	int mo = 10000;
 	
 	static struct option long_options[] = {
 		{"help",	no_argument, 0,	'h'},
@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
 	int fd, result;
 	fd = wiringPiI2CSetup(0x04);
 
-	if(du > 0)
-		cout << wiringPiI2CRead(fd) << endl;
-	if(mo > 0)
-		wiringPiI2CWrite(fd, 0x01);
+	if(mo < 100)
+		wiringPiI2CWriteReg8(fd, 0x02, mo);
+	if(du < 255)
+		wiringPiI2CWriteReg8(fd, 0x01, du);
 	return 0;
 }
