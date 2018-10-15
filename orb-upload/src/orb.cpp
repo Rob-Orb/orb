@@ -6,8 +6,18 @@
 using namespace std;
 
 void helper(){
-	cout << "Orb Application Upload :\n
-	Uses Picberry to upload firmwares to the PIC" << endl;
+	cout << "Orb Application Upload:\n
+	Uses Picberry to upload firmwares to the PIC\n\n
+	Usage: orb upload [options]\n\n
+	Options: \n\n
+	-h\tprint help\n
+	-r [output]\tread chip to file [defaults to ofile.hex]\n
+	-w firmware\tbulk erase, write and check firmware\n
+	-e\terase chip\n
+	-b\tblank check of the chip\n
+	-d\tread configuration registers\n
+	--noverify\tskip memory verification after writing\n
+	--debug\tturn on debug" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -33,7 +43,6 @@ int main(int argc, char *argv[])
 
 	if(h){
 		helper();
-		system(("picberry -h").c_str());
 		return 0;
 	}
 
