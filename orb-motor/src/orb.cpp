@@ -5,17 +5,18 @@
 #include <stdint.h>
 
 #include <wiringPiI2C.h>
-
+#include <orb_config.hpp>
 
 using namespace std;
 
 void helper(){
-	cout << "Orb Application Motor\n
-	Gives you the power to control the motors\n\n
-	Usqge: orb motor [options]\n\n
-	Options:\n
-	-m\tmotor (0:all - default, 1-2)\n
-	-d\tduty cycle (0-100)%" << endl;
+	cout << "Orb Application Motor Version: " << ORB_VERSION << endl <<
+	"Gives you the power to control the motors" << endl <<endl <<
+	"Usage: orb motor [options]" <<endl <<endl <<
+	"Options:" << endl <<
+	"-h\tprint help" << endl <<
+	"-m\tmotor (0:all - default, 1-2)" <<endl <<
+	"-d\tduty cycle (0-100)%" << endl << endl;
 }
 
 int main(int argc, char *argv[])
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
 	
 	int du = 10000;
 	int mo = 0;
+	bool h = false;
 	
 	static struct option long_options[] = {
 		{"help",	no_argument, 0,	'h'},
@@ -44,17 +46,22 @@ int main(int argc, char *argv[])
 			case 'd':
 				du = atoi(optarg);
 				if(optarg[0] == '-' || du > 100){
-                                        cerr << "Wrong input to option d" << end
-l;
+                                        cerr << "Wrong input to option d" << endl;
                                         return 0;
                                 }
 				break;
 			case 'h':
 			default:
-				helper();
+				h = true;
 				break;
 		}
 	}
+
+	if(h || argc < 2){
+		helper();
+		return 0;
+	}
+
 	int fd, result;
 	fd = wiringPiI2CSetup(0x04);
 
