@@ -1,1 +1,1 @@
-orb_upload_completion.bash /etc/bash_completion.d/
+orb_motor_completion.bash /etc/bash_completion.d/
