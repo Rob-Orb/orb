@@ -11,7 +11,8 @@ _orb_completion()
 	if [ -e orb_*_completion.bash ]; then
 		ORB_RES=$(find . -name 'orb_*_completion.bash' -exec basename \{} _completion.bash \; | sed 's/orb_//g' | tr '\r\n' ' ')
 	else
-		echo "\nNo Orb Applications Installed"
+		echo ""
+		echo "No Orb Applications Installed"
 		return 0
 	fi
 	
