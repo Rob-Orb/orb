@@ -16,7 +16,8 @@ void helper(){
 	"Options:" << endl <<
 	"-h\tprint help" << endl <<
 	"-m\tmotor (0:all - default, 1-2)" <<endl <<
-	"-d\tduty cycle (0-100)%" << endl << endl;
+	"-d\tduty cycle (0-100)%" << endl << 
+	"-r\tread encoder (1,2)" << endl << endl;
 }
 
 int main(int argc, char *argv[])
@@ -26,15 +27,17 @@ int main(int argc, char *argv[])
 	
 	int du = 10000;
 	int mo = 0;
+	int re = 10;
 	bool h = false;
 	
 	static struct option long_options[] = {
 		{"help",	no_argument, 0,	'h'},
 		{"motor",	required_argument, 0,	'm'},
 		{"duty",	required_argument, 0,	'd'},
+		{"read",	required_argument, 0,	'r'},
 		{0,0,0,0}
 	};
-	while ((opt = getopt_long(argc, argv, "hm:d:",long_options, &option_index)) != -1) {
+	while ((opt = getopt_long(argc, argv, "hm:d:r:",long_options, &option_index)) != -1) {
 		switch (opt) {
 			case 'm':
 				mo = atoi(optarg);
@@ -49,6 +52,13 @@ int main(int argc, char *argv[])
                                         cerr << "Wrong input to option d" << endl;
                                         return 0;
                                 }
+				break;
+			case 'r':
+				re = atoi(optarg);
+				if(optarg[0] == '-' || re > 2){
+					cerr << "Wrong input to option r" << endl;
+					return 0;
+				}
 				break;
 			case 'h':
 			default:
@@ -69,5 +79,9 @@ int main(int argc, char *argv[])
 		wiringPiI2CWriteReg8(fd, 0x02, mo);
 	if(du < 101)
 		wiringPiI2CWriteReg8(fd, 0x01, uint8_t(du*2.55));
+	if(re < 10){
+		wiringPiI2CWriteReg8(fd, 0x03, re);
+		cout << wiringPiI2CRead(fd) << endl;
+	}
 	return 0;
 }
