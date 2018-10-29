@@ -5,7 +5,7 @@ _orb_completion()
 	local cur prev
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"	
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
 
 	ORB_RES=''
 	if [ -e orb_*_completion.bash ]; then
