@@ -1,0 +1,112 @@
+--- a/orb_upload_completion.bash
++++ b/orb_upload_completion.bash
+@@ -1,2 +1,22 @@
+ #/usr/bin/env bash
+-complete -W "motor" upload
++_orb_upload_completion()
++{
++	local cur prev
++
++	#COMPREPLY=()
++	cur="${COMP_WORDS[COMP_CWORD]}"
++	prev="${COMP_WORDS[COMP_CWORD-1]}"
++
++	RESULT="$(wget -qO - https://rob-orb.github.io/firmwares/ls.index | tr '\r\n' ' ')"
++	
++	if [ $COMP_CWORD == 2 ]; then
++		case "$prev" in
++			"upload")
++			COMPREPLY=($(compgen -W "$RESULT" -- $cur));;
++		*)
++		;;
++		esac
++	fi
++	return 0
++}
++#complete -F _orb_upload_completion orb
+--- a/src/orb.cpp
++++ b/src/orb.cpp
+@@ -8,17 +8,17 @@
+ 
+ void helper(){
+ 	cout << "\nOrb Application Upload Version: " << ORB_VERSION << endl <<
+-	"Uses Picberry to upload firmwares to the PIC" << endl << endl <<
+-	"Usage: orb upload [options]" << endl << endl <<
+-	"Options: " << endl <<
+-	"-h\t\tprint help" << endl <<
+-	"-r [output]\tread chip to file [defaults to ofile.hex] " << endl <<
+-	"-w firmware\tbulk erase, write and check firmware" << endl <<
+-	"-e\t\terase chip" <<endl <<
+-	"-b\t\tblank check of the chip" << endl <<
+-	"-d\t\tread configuration registers" << endl <<
+-	"--noverify\tskip memory verification after writing" << endl <<
+-	"--debug\t\tturn on debug" << endl <<endl;
++		"Uses Picberry to upload firmwares to the PIC" << endl << endl <<
++		"Usage: orb upload [options]" << endl << endl <<
++		"Options: " << endl <<
++		"-h\t\tprint help" << endl <<
++		"-r [output]\tread chip to file [defaults to ofile.hex] " << endl <<
++		"-w firmware\tbulk erase, write and check firmware" << endl <<
++		"-e\t\terase chip" <<endl <<
++		"-b\t\tblank check of the chip" << endl <<
++		"-d\t\tread configuration registers" << endl <<
++		"--noverify\tskip memory verification after writing" << endl <<
++		"--debug\t\tturn on debug" << endl <<endl;
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -28,6 +28,8 @@
+ 
+ 	bool h = false;
+ 	bool invalid = false;
++	bool write = false;
++	string writeArg = "";
+ 
+ 	static struct option long_options[] = {
+ 		{"help",	no_argument, 0, 'h'},
+@@ -40,7 +42,7 @@
+ 		{"debug",	no_argument, 0, 1},
+ 		{0,0,0,0}
+ 	};
+-	
++
+ 	while((opt = getopt_long(argc, argv, "hw:r:debc", long_options, &option_index)) != -1) {
+ 		switch(opt){
+ 			case ':':
+@@ -48,6 +50,10 @@
+ 			case 'h':
+ 				h = true;
+ 				break;
++			case 'w':
++				write = true;
++				writeArg = optarg;
++				break;
+ 			default:
+ 				h = false;
+ 				break;
+@@ -59,10 +65,21 @@
+ 		return 0;
+ 	}
+ 
++	if(write){
++		cout << writeArg.back() << endl;
++		if(writeArg.back()!='x'){
++			cout << "Gathering firmware " + writeArg + "..." << endl;
++			system(("wget -q https://rob-orb.github.io/firmwares/"+string(writeArg)+".hex -O tmp-1234-rob-orb.hex").c_str());
+ 
+-	string args = "";
+-	for(int i = 1; i < argc; ++i)
+-		args += string(argv[i]) + " ";
+-	system(("picberry -f pic16f150x -g 13,19,26 "+args).c_str());
++			system("picberry -f pic16f150x -g 13,19,26 -w tmp-1234-rob-orb.hex");
++			system("rm -f tmp-1234-rob-orb.hex");
++		}
++	}else{
++
++		string args = "";
++		for(int i = 1; i < argc; ++i)
++			args += string(argv[i]) + " ";
++		system(("picberry -f pic16f150x -g 13,19,26 "+args).c_str());
++	}
+ 	return 0;
+ }

@@ -1,3 +1,9 @@
+orb-upload (0.0.1-0+nmu1) stretch; urgency=medium
+
+  * Added bash completion
+
+ -- Ulysse Vautier (Rob-Orb) <ulysse.vautier@gmail.com>  Mon, 29 Oct 2018 14:23:01 +0000
+
 orb-upload (0.0.1-0) stretch; urgency=low
 
   * Initial release.
