@@ -1,3 +1,9 @@
+orb-core (0.0.1-0+nmu2) stretch; urgency=high
+
+  * [HOTFIX] bash completion bug
+
+ -- Ulysse Vautier (Rob-Orb) <ulysse.vautier@gmail.com>  Mon, 29 Oct 2018 15:02:40 +0000
+
 orb-core (0.0.1-0+nmu1) stretch; urgency=medium
 
   * Added bash completion
