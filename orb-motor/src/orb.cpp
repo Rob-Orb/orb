@@ -133,8 +133,26 @@ int main(int argc, char *argv[])
 		wiringPiI2CWriteReg8(fd, regi, du);
 	}
 	if((func&0x03) == FUNC_READ){
+		regi |= 3 << 6;
 		wiringPiI2CWriteReg8(fd, regi, re);
-		cout << wiringPiI2CRead(fd) << endl;
+		int result = 0;
+		uint8_t rec = wiringPiI2CRead(fd);
+		//cout << (int)rec << endl;
+		result = rec;
+		
+		rec = wiringPiI2CRead(fd);
+		//cout << (int)rec << endl;
+		result |= rec<<8;
+
+		rec = wiringPiI2CRead(fd);
+		//cout << (int)rec << endl;
+		result |= rec<<16;
+
+		rec = wiringPiI2CRead(fd);
+		//cout << (int)rec << endl;
+		result |= rec<<24;
+
+		cout << result << endl;
 	}
 	return 0;
 }
