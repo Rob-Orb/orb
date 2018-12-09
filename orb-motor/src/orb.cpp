@@ -10,7 +10,7 @@
 
 #define FUNC_MOTOR 2
 #define FUNC_TIME 1
-#define FUNC_READ 3
+#define FUNC_READ 0
 
 using namespace std;
 
@@ -55,10 +55,12 @@ int main(int argc, char *argv[])
 		switch (opt) {
 			case 'm':
 				mo = atoi(optarg);
-				if(optarg[0] == '-' || mo > 3){
+				if(optarg[0] == '-' || mo > 2){
 					cerr << "Wrong input to option m" << endl;
 					return 0;
 				}
+				if(mo == 0)
+					mo = 3;
 				break;
 			case 'd':
 				di = atoi(optarg);
@@ -74,7 +76,7 @@ int main(int argc, char *argv[])
 					cerr << "Wrong input to option r" << endl;
 					return 0;
 				}
-				func = 3;
+				func = 0;
 				break;
 			case '%':
 				du = atoi(optarg);
@@ -82,7 +84,7 @@ int main(int argc, char *argv[])
                                         cerr << "Wrong input to option %" << endl;
                                         return 0;
                                 }
-				func = 2;
+				func += 2;
 				break;
 			case 't':
 				ti = atoi(optarg);
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
                                         cerr << "Wrong input to option t" << endl;
                                         return 0;
                                 }
-				func = 1;
+				func += 1;
 				break;
 			case 'h':
 			default:
@@ -111,7 +113,7 @@ int main(int argc, char *argv[])
 
 	regi = mo;
 	if(changeDir){
-		if(mo != 0){
+		if(mo != 3){
 			regi |= 1 << (mo*2+1);
 			regi |= di << ((mo-1)*2+2);
 		}else{
@@ -121,21 +123,18 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if(func > 0)
-		regi |= func << 6;
-	switch(func){
-		case FUNC_MOTOR:
-		wiringPiI2CWriteReg8(fd, regi, du);
-			break;
-		case FUNC_TIME:
+	if((func&0x01) == FUNC_TIME){
+		regi |= 1 << 6;
 		wiringPiI2CWriteReg8(fd, regi, ti);
-			break;
-		case FUNC_READ:
+	}
+	if((func&0X02) == FUNC_MOTOR){
+		regi &= ~(1UL << 6);
+		regi |= 2 << 6;
+		wiringPiI2CWriteReg8(fd, regi, du);
+	}
+	if((func&0x03) == FUNC_READ){
 		wiringPiI2CWriteReg8(fd, regi, re);
 		cout << wiringPiI2CRead(fd) << endl;
-			break;
-		default:
-			break;
 	}
 	return 0;
 }
