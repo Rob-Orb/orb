@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 			cout << "Gathering firmware " + writeArg + "..." << endl;
 			system(("wget -q https://rob-orb.github.io/firmwares/"+string(writeArg)+".hex -O tmp-1234-rob-orb.hex").c_str());
 
-			system("picberry -f pic16f150x -g 13,19,26 -w tmp-1234-rob-orb.hex");
+			system("picberry -f pic16f150x -g 21,20,19 -w tmp-1234-rob-orb.hex");
 			system("rm -f tmp-1234-rob-orb.hex");
 		}
 	}else{
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 		string args = "";
 		for(int i = 1; i < argc; ++i)
 			args += string(argv[i]) + " ";
-		system(("picberry -f pic16f150x -g 13,19,26 "+args).c_str());
+		system(("picberry -f pic16f150x -g 21,20,19 "+args).c_str());
 	}
 	return 0;
 }
