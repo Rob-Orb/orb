@@ -8,9 +8,12 @@
 #include <wiringPiI2C.h>
 #include <orb_config.hpp>
 
-#define FUNC_MOTOR 2
-#define FUNC_TIME 1
-#define FUNC_READ 0
+#define FUNC_SPEED	0x08
+#define FUNC_POS	0x04
+#define FUNC_MOTOR	0x02
+#define FUNC_TIME	0x01
+#define FUNC_READ_ENC	0x10
+#define FUNC_READ_STATE	0x20
 
 using namespace std;
 
@@ -21,10 +24,13 @@ void helper(){
 	"Options:" << endl <<
 	"-h\tprint help" << endl <<
 	"-m\tmotor (0:all - default, 1-2)" << endl <<
-	"-d\tdirection (0:default, 0 : left - 1 : right)" << endl <<
-	"-%\tduty cycle (0-100)%" << endl << 
-	"-t\ttime running (0-255)s" << endl << 
-	"-r\tread encoder (1,2)" << endl << endl;
+	"-d\tdirection (0 : left - 1 : right)" << endl <<
+	"-%\tduty cycle (0-100) %" << endl << 
+	"-p\tposition control (0-255)" << endl << 
+	"-s\tspeed control (0-255)" << endl << 
+	"-t\ttime running (0-255) s" << endl << 
+	"-e\tread encoder" << endl <<
+	"-r\tread state" << endl << endl;
 }
 
 int main(int argc, char *argv[])
@@ -44,14 +50,17 @@ int main(int argc, char *argv[])
 	
 	static struct option long_options[] = {
 		{"help",	no_argument, 0,	'h'},
+		{"readencoder",	no_argument, 0,	'e'},
+		{"readstate",	no_argument, 0,	'r'},
 		{"motor",	required_argument, 0,	'm'},
 		{"dir",		required_argument, 0,	'd'},
 		{"duty",	required_argument, 0,	'%'},
 		{"time",	required_argument, 0,	't'},
-		{"read",	required_argument, 0,	'r'},
+		{"position",	required_argument, 0,	'p'},
+		{"speed",	required_argument, 0,	's'},
 		{0,0,0,0}
 	};
-	while ((opt = getopt_long(argc, argv, "hm:d:%:t:r:",long_options, &option_index)) != -1) {
+	while ((opt = getopt_long(argc, argv, "hrem:d:%:t:p:s:",long_options, &option_index)) != -1) {
 		switch (opt) {
 			case 'm':
 				mo = atoi(optarg);
@@ -70,13 +79,11 @@ int main(int argc, char *argv[])
                                 }
 				changeDir = true;
 				break;
+			case 'e':
+				func = FUNC_READ_ENC;
+				break;
 			case 'r':
-				re = atoi(optarg);
-				if(optarg[0] == '-' || re > 2){
-					cerr << "Wrong input to option r" << endl;
-					return 0;
-				}
-				func = 0;
+				func = FUNC_READ_STATE;
 				break;
 			case '%':
 				du = atoi(optarg);
@@ -84,7 +91,23 @@ int main(int argc, char *argv[])
                                         cerr << "Wrong input to option %" << endl;
                                         return 0;
                                 }
-				func += 2;
+				func |= FUNC_MOTOR;
+				break;
+			case 'p':
+				du = atoi(optarg);
+				if(optarg[0] == '-' || du > 255){
+                                        cerr << "Wrong input to option p" << endl;
+                                        return 0;
+                                }
+				func |= FUNC_POS;
+				break;
+			case 's':
+				du = atoi(optarg);
+				if(optarg[0] == '-' || du > 255){
+                                        cerr << "Wrong input to option s" << endl;
+                                        return 0;
+                                }
+				func |= FUNC_SPEED;
 				break;
 			case 't':
 				ti = atoi(optarg);
@@ -92,7 +115,7 @@ int main(int argc, char *argv[])
                                         cerr << "Wrong input to option t" << endl;
                                         return 0;
                                 }
-				func += 1;
+				func |= FUNC_TIME;
 				break;
 			case 'h':
 			default:
@@ -113,46 +136,64 @@ int main(int argc, char *argv[])
 
 	regi = mo;
 	if(changeDir){
-		if(mo != 3){
-			regi |= 1 << (mo*2+1);
-			regi |= di << ((mo-1)*2+2);
-		}else{
-			regi |= (0x05 << 3);
-			regi |= di << 2;
-			regi |= di << 4;
-		}
+		regi |= 1 << 3;
+		regi |= di << 2;
 	}
 
 	if((func&0x01) == FUNC_TIME){
-		regi |= 1 << 6;
+		regi |= 1 << 4;
 		wiringPiI2CWriteReg8(fd, regi, ti);
 	}
+	regi &= ~(1UL << 4);
+
 	if((func&0X02) == FUNC_MOTOR){
-		regi &= ~(1UL << 6);
-		regi |= 2 << 6;
+		regi |= 0x02 << 4;
+		wiringPiI2CWriteReg8(fd, regi, du);
+	}else if((func&0x04) == FUNC_POS){
+		regi |= 0x04 << 4;
+		wiringPiI2CWriteReg8(fd, regi, du);
+	}else if((func&0x08) == FUNC_SPEED){
+		regi |= 0x05 << 4;
 		wiringPiI2CWriteReg8(fd, regi, du);
 	}
-	if((func&0x03) == FUNC_READ){
-		regi |= 3 << 6;
-		wiringPiI2CWriteReg8(fd, regi, re);
-		int result = 0;
-		uint8_t rec = wiringPiI2CRead(fd);
-		//cout << (int)rec << endl;
-		result = rec;
+	regi &= 0x0F;
+
+	if((func&0x10) == FUNC_READ_ENC || (func&0x20) == FUNC_READ_STATE){
+		if(mo == 3){
+			cerr << "Can only choose one motor" << endl;
+			return 0;
+		}
+		regi |= 0x03 << 4;
+		if((func&0x10) == FUNC_READ_ENC){
+			wiringPiI2CWriteReg8(fd, regi, 0);
+			int result = 0;
+			uint8_t rec = wiringPiI2CRead(fd);
+			//cout << (int)rec << endl;
+			result = rec;
 		
-		rec = wiringPiI2CRead(fd);
-		//cout << (int)rec << endl;
-		result |= rec<<8;
+			rec = wiringPiI2CRead(fd);
+			//cout << (int)rec << endl;
+			result |= rec<<8;
 
-		rec = wiringPiI2CRead(fd);
-		//cout << (int)rec << endl;
-		result |= rec<<16;
+			rec = wiringPiI2CRead(fd);
+			//cout << (int)rec << endl;
+			result |= rec<<16;
 
-		rec = wiringPiI2CRead(fd);
-		//cout << (int)rec << endl;
-		result |= rec<<24;
+			rec = wiringPiI2CRead(fd);
+			//cout << (int)rec << endl;
+			result |= rec<<24;
 
-		cout << result << endl;
+			cout << result << endl;
+		}
+		else if((func&0x20) == FUNC_READ_STATE){
+			wiringPiI2CWriteReg8(fd, regi, 0x40);
+			int result = 0;
+			uint8_t rec = wiringPiI2CRead(fd);
+			//cout << (int)rec << endl;
+			result = rec;
+			
+			cout << result << endl;
+		}
 	}
 	return 0;
 }
