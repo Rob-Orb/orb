@@ -9,7 +9,7 @@ _orb_upload_completion()
 
 	RESULT="$(wget -qO - https://rob-orb.github.io/firmwares/ls.index | tr '\r\n' ' ')"
 	
-	if [ $COMP_CWORD == 3 ]; then
+	if [ $COMP_CWORD == 2 ]; then
 		case "$prev" in
 			"upload")
 			COMPREPLY=($(compgen -W "$RESULT" -- $cur));;
