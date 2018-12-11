@@ -26,8 +26,8 @@ void helper(){
 	"-m\tmotor (0:all - default, 1-2)" << endl <<
 	"-d\tdirection (0 : left - 1 : right)" << endl <<
 	"-%\tduty cycle (0-100) %" << endl << 
-	"-p\tposition control (0-255)" << endl << 
-	"-s\tspeed control (0-255)" << endl << 
+	"-p\tposition control (0-1023)" << endl << 
+	"-s\tspeed control (0-1023)" << endl << 
 	"-t\ttime running (0-255) s" << endl << 
 	"-e\tread encoder" << endl <<
 	"-r\tread state" << endl << endl;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'p':
 				du = atoi(optarg);
-				if(optarg[0] == '-' || du > 255){
+				if(optarg[0] == '-' || du > 1023){
                                         cerr << "Wrong input to option p" << endl;
                                         return 0;
                                 }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 				break;
 			case 's':
 				du = atoi(optarg);
-				if(optarg[0] == '-' || du > 255){
+				if(optarg[0] == '-' || du > 1023){
                                         cerr << "Wrong input to option s" << endl;
                                         return 0;
                                 }
@@ -148,13 +148,13 @@ int main(int argc, char *argv[])
 
 	if((func&0X02) == FUNC_MOTOR){
 		regi |= 0x02 << 4;
-		wiringPiI2CWriteReg8(fd, regi, du);
+		wiringPiI2CWriteReg8(fd, regi, (uint8_t)(du*2.55));
 	}else if((func&0x04) == FUNC_POS){
 		regi |= 0x04 << 4;
-		wiringPiI2CWriteReg8(fd, regi, du);
+		wiringPiI2CWriteReg8(fd, regi, (uint8_t)(du/4));
 	}else if((func&0x08) == FUNC_SPEED){
 		regi |= 0x05 << 4;
-		wiringPiI2CWriteReg8(fd, regi, du);
+		wiringPiI2CWriteReg8(fd, regi, (uint8_t)(du/4));
 	}
 	regi &= 0x0F;
 
