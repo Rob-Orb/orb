@@ -1,3 +1,11 @@
+orb-motor (0.0.2-1) stretch; urgency=medium
+
+  * Fixed Bugs
+  * Changed message protocol according to new firmware
+  * Added position control, speed control, and option range
+
+ -- Ulysse Vautier (Rob-Orb) <ulysse.vautier@gmail.com>  Tue, 11 Dec 2018 15:53:32 +0000
+
 orb-motor (0.0.2-0) stretch; urgency=medium
 
   * Changed message protocol according to new firmware
