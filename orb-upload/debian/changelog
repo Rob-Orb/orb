@@ -1,3 +1,9 @@
+orb-upload (0.0.2-0) stretch; urgency=medium
+
+  * HOTFIXED. previous patch destroyed everything
+
+ -- Ulysse Vautier (Rob-Orb) <ulysse.vautier@gmail.com>  Tue, 11 Dec 2018 17:46:44 +0000
+
 orb-upload (0.0.1-0+nmu1) stretch; urgency=medium
 
   * Added bash completion
