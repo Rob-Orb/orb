@@ -1,3 +1,9 @@
+orb-motor (0.0.2-0) stretch; urgency=medium
+
+  * Changed message protocol according to new firmware
+
+ -- Ulysse Vautier (Rob-Orb) <ulysse.vautier@gmail.com>  Sat, 17 Nov 2018 14:30:07 +0000
+
 orb-motor (0.0.1-0+nmu1) stretch; urgency=medium
 
   * Added bash completion

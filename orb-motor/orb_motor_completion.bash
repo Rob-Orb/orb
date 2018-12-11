@@ -10,7 +10,7 @@ _orb_motor_completion()
 	if [ $COMP_CWORD == 2 ]; then
 		case "$prev" in
 			"motor")
-			COMPREPLY=($(compgen -W "-d -m -r" -- $cur));;
+			COMPREPLY=($(compgen -W "-d -m -r -% -h" -- $cur));;
 		*)
 		;;
 		esac
