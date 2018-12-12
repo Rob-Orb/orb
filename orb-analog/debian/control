@@ -1,0 +1,14 @@
+Source: orb-motor
+Maintainer: Ulysse Vautier <ulysse.vautier@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 0.0.2
+Priority: optional
+Section: base
+
+Package: orb-motor
+Architecture: armhf
+Priority: optional
+Section: base
+Depends: orb-core, wiringpi
+Description: Orb Application to control the motors
+ This binary gives you the power to control different Rob-Orb shields.
